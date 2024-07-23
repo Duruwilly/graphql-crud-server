@@ -99,6 +99,12 @@ const mutation = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
+        Project.find({ clientId: args.id }).then((projects) => {
+          projects.forEach((project) => {
+            console.log(project);
+            project.deleteOne({clientId: project.clientId});
+          });
+        });
         return Client.findByIdAndDelete(args.id);
       },
     },
@@ -135,19 +141,19 @@ const mutation = new GraphQLObjectType({
     deleteProject: {
       type: ProjectType,
       args: {
-        id: {type: new GraphQLNonNull(GraphQLID)},
+        id: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
-        return Project.findByIdAndDelete(args.id)
-      }
+        return Project.findByIdAndDelete(args.id);
+      },
     },
     // update a project
     updateProject: {
       type: ProjectType,
       args: {
-        id: {type: new GraphQLNonNull(GraphQLID)},
-        name: {type: GraphQLString},
-        description: {type: GraphQLString},
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        name: { type: GraphQLString },
+        description: { type: GraphQLString },
         status: {
           type: new GraphQLEnumType({
             name: "ProjectStatusUpdate",
@@ -160,15 +166,19 @@ const mutation = new GraphQLObjectType({
         },
       },
       resolve(parent, args) {
-        return Project.findByIdAndUpdate(args.id, {
-          $set: {
-            name: args.name,
-            description: args.description,
-            status: args.status
-          }
-        }, {new: true})
-      }
-    }
+        return Project.findByIdAndUpdate(
+          args.id,
+          {
+            $set: {
+              name: args.name,
+              description: args.description,
+              status: args.status,
+            },
+          },
+          { new: true }
+        );
+      },
+    },
   },
 });
 
